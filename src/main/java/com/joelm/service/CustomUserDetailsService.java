@@ -1,5 +1,6 @@
 package com.joelm.service;
 
+import com.joelm.component.CustomUserDetails;
 import com.joelm.entity.User;
 import com.joelm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User: " + username + " not found!");
         }
 
-        return null;
+        return new CustomUserDetails(user);
     }
 }

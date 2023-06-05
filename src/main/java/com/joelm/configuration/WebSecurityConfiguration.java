@@ -1,39 +1,39 @@
 package com.joelm.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
 public class WebSecurityConfiguration {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
     @Bean
-    AuthenticationProvider createAuthenticationProvider() {
-        DaoAuthenticationProvider provider
-                = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-
-        provider.setPasswordEncoder(new BCryptPasswordEncoder());
-        return provider;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public AuthenticationManager authManager(UserDetailsService detailsService) {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
+        daoProvider.setUserDetailsService(detailsService);
+        return new ProviderManager(daoProvider);
+    }
 
-        http.authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/")
-                        .permitAll()
-                        .requestMatchers("/home")
-                        .authenticated()
-                );
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .httpBasic(basic -> basic.init(http))
+                .build();
     }
 
 }

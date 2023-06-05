@@ -1,4 +1,4 @@
-package com.joelm.controller;
+package com.joelm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -13,12 +13,14 @@ import java.util.Set;
 public class ApplicationUser implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name="user_id")
     private Integer userId;
 
+    @Column(name="username")
     private String username;
 
+    @Column(name="password")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
